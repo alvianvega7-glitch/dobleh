@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamVerse - Nonton Film & TV Show</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        :root {
+            --netflix-red: #E50914;
+            --dark-bg: #141414;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141414;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        .nav-gradient {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, transparent);
+            transition: background 0.3s ease;
+        }
+
+        .nav-solid {
+            background: var(--dark-bg);
+        }
+
+        .hero-overlay {
+            background: linear-gradient(77deg, rgba(0,0,0,.6) 0, rgba(0,0,0,0) 85%);
+        }
+
+        .hero-bottom-fade {
+            background: linear-gradient(180deg, transparent, rgba(37,37,37,.61), #141414);
+        }
+
+        .movie-card {
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.1);
+            z-index: 50;
+        }
+
+        .movie-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigasi -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 px-4 md:px-12 py-4 flex items-center justify-between nav-gradient">
+        <div class="flex items-center space-x-8">
+            <h1 class="text-red-600 text-3xl font-bold tracking-tighter uppercase">StreamVerse</h1>
+            <ul class="hidden lg:flex space-x-5 text-sm font-medium text-gray-300">
+                <li class="hover:text-white transition cursor-pointer font-bold text-white">Beranda</li>
+                <li class="hover:text-white transition cursor-pointer">Acara TV</li>
+                <li class="hover:text-white transition cursor-pointer">Film</li>
+                <li class="hover:text-white transition cursor-pointer">Baru & Populer</li>
+                <li class="hover:text-white transition cursor-pointer">Daftar Saya</li>
+            </ul>
+        </div>
+        
+        <div class="flex items-center space-x-6 text-white">
+            <i class="fas fa-search cursor-pointer hover:text-gray-400"></i>
+            <span class="hidden sm:inline text-sm cursor-pointer hover:text-gray-400">Anak-anak</span>
+            <i class="fas fa-bell cursor-pointer hover:text-gray-400"></i>
+            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center cursor-pointer">
+                <i class="fas fa-user text-xs"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative h-[85vh] w-full overflow-hidden">
+        <!-- Background Image/Video -->
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop');">
+            <div class="absolute inset-0 bg-black/40"></div>
+        </div>
+        
+        <!-- Overlays -->
+        <div class="absolute inset-0 hero-overlay"></div>
+        <div class="absolute bottom-0 w-full h-40 hero-bottom-fade"></div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 h-full flex flex-col justify-center px-4 md:px-12 max-w-2xl">
+            <h2 class="text-5xl md:text-7xl font-bold mb-4 drop-shadow-lg">STRANGER <span class="text-red-600">THINGS</span></h2>
+            <p class="text-lg md:text-xl text-gray-200 mb-6 drop-shadow-md">
+                Ketika seorang anak laki-laki hilang, sebuah kota kecil mengungkap misteri yang melibatkan eksperimen rahasia, kekuatan supernatural yang menakutkan, dan satu gadis kecil yang aneh.
+            </p>
+            <div class="flex space-x-4">
+                <button class="bg-white text-black px-8 py-2 rounded-md font-bold flex items-center hover:bg-opacity-80 transition">
+                    <i class="fas fa-play mr-2"></i> Putar
+                </button>
+                <button class="bg-gray-500/50 text-white px-8 py-2 rounded-md font-bold flex items-center hover:bg-gray-500/30 transition">
+                    <i class="fas fa-info-circle mr-2"></i> Informasi Selengkapnya
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Movie Rows Section -->
+    <main class="relative z-20 -mt-20 space-y-12 pb-20">
+        
+        <!-- Trending Section -->
+        <section class="pl-4 md:pl-12">
+            <h3 class="text-xl md:text-2xl font-semibold mb-4">Sedang Tren Sekarang</h3>
+            <div id="trending-row" class="movie-row flex space-x-4 overflow-x-auto pb-4 scroll-smooth">
+                <!-- Rendered by JS -->
+            </div>
+        </section>
+
+        <!-- TV Series Section -->
+        <section class="pl-4 md:pl-12">
+            <h3 class="text-xl md:text-2xl font-semibold mb-4">Acara TV Indonesia Populer</h3>
+            <div id="tv-row" class="movie-row flex space-x-4 overflow-x-auto pb-4 scroll-smooth">
+                <!-- Rendered by JS -->
+            </div>
+        </section>
+
+        <!-- Blockbuster Section (Wider Cards) -->
+        <section class="pl-4 md:pl-12">
+            <h3 class="text-xl md:text-2xl font-semibold mb-4">Film Blockbuster</h3>
+            <div id="blockbuster-row" class="movie-row flex space-x-4 overflow-x-auto pb-4 scroll-smooth">
+                <!-- Rendered by JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black/40 pt-10 pb-20 px-4 md:px-12 text-gray-500 text-sm">
+        <div class="flex space-x-6 text-white text-xl mb-6">
+            <i class="fab fa-facebook-f cursor-pointer hover:text-gray-300"></i>
+            <i class="fab fa-instagram cursor-pointer hover:text-gray-300"></i>
+            <i class="fab fa-twitter cursor-pointer hover:text-gray-300"></i>
+            <i class="fab fa-youtube cursor-pointer hover:text-gray-300"></i>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <ul class="space-y-2">
+                <li class="hover:underline cursor-pointer">Audio dan Subtitle</li>
+                <li class="hover:underline cursor-pointer">Pusat Bantuan</li>
+                <li class="hover:underline cursor-pointer">Kartu Hadiah</li>
+            </ul>
+            <ul class="space-y-2">
+                <li class="hover:underline cursor-pointer">Pusat Media</li>
+                <li class="hover:underline cursor-pointer">Hubungan Investor</li>
+                <li class="hover:underline cursor-pointer">Lowongan Kerja</li>
+            </ul>
+            <ul class="space-y-2">
+                <li class="hover:underline cursor-pointer">Ketentuan Penggunaan</li>
+                <li class="hover:underline cursor-pointer">Privasi</li>
+                <li class="hover:underline cursor-pointer">Informasi Legal</li>
+            </ul>
+            <ul class="space-y-2">
+                <li class="hover:underline cursor-pointer">Hubungi Kami</li>
+                <li class="hover:underline cursor-pointer">Preferensi Cookie</li>
+                <li class="hover:underline cursor-pointer">Informasi Perusahaan</li>
+            </ul>
+        </div>
+        <button class="border border-gray-500 px-2 py-1 mb-6 hover:text-white transition">Kode Layanan</button>
+        <p>&copy; 1997-2024 StreamVerse, Inc.</p>
+    </footer>
+
+    <!-- Video Modal (Simulasi) -->
+    <div id="modal" class="fixed inset-0 bg-black/80 z-[100] hidden items-center justify-center p-4">
+        <div class="bg-[#181818] w-full max-w-4xl rounded-lg overflow-hidden relative">
+            <button id="close-modal" class="absolute top-4 right-4 text-white text-2xl z-10">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="aspect-video bg-gray-900 flex items-center justify-center">
+                <div class="text-center">
+                    <i class="fas fa-play text-6xl text-white/20 mb-4"></i>
+                    <p class="text-gray-400">Memutar Trailer...</p>
+                </div>
+            </div>
+            <div class="p-8">
+                <div class="flex items-center space-x-4 mb-4">
+                    <span class="text-green-500 font-bold">98% Cocok</span>
+                    <span class="border border-gray-600 px-2 text-xs">13+</span>
+                    <span class="text-gray-400">2 Jam 15 Menit</span>
+                    <span class="border border-gray-600 px-1 text-[10px] rounded">HD</span>
+                </div>
+                <h2 id="modal-title" class="text-3xl font-bold mb-2 text-white">Judul Film</h2>
+                <p id="modal-desc" class="text-gray-400">Deskripsi singkat tentang alur cerita film ini akan muncul di sini untuk memberikan gambaran kepada penonton.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Mock untuk Konten
+        const movies = [
+            { id: 1, title: 'Epic Adventure', img: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=400&h=225&auto=format&fit=crop', type: 'trending' },
+            { id: 2, title: 'Dark Mystery', img: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=400&h=225&auto=format&fit=crop', type: 'trending' },
+            { id: 3, title: 'Space Odyssey', img: 'https://images.unsplash.com/photo-1614728263952-84ea206f99b6?q=80&w=400&h=225&auto=format&fit=crop', type: 'trending' },
+            { id: 4, title: 'Cyber City', img: 'https://images.unsplash.com/photo-1605142859862-978be7eba909?q=80&w=400&h=225&auto=format&fit=crop', type: 'trending' },
+            { id: 5, title: 'Nature Pure', img: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=400&h=225&auto=format&fit=crop', type: 'trending' },
+            { id: 6, title: 'Indo Horror', img: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=400&h=225&auto=format&fit=crop', type: 'tv' },
+            { id: 7, title: 'Jakarta Love', img: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400&h=225&auto=format&fit=crop', type: 'tv' },
+            { id: 8, title: 'Comedy Night', img: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=400&h=225&auto=format&fit=crop', type: 'tv' },
+            { id: 9, title: 'The Last Stand', img: 'https://images.unsplash.com/photo-1535016120720-40c646bebbbb?q=80&w=400&h=225&auto=format&fit=crop', type: 'blockbuster' },
+            { id: 10, title: 'Gladiator II', img: 'https://images.unsplash.com/photo-1599739291060-4578e77dac5d?q=80&w=400&h=225&auto=format&fit=crop', type: 'blockbuster' },
+            { id: 11, title: 'Neon Runner', img: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400&h=225&auto=format&fit=crop', type: 'blockbuster' }
+        ];
+
+        // Inisialisasi Konten
+        window.onload = () => {
+            renderMovies();
+            setupNavbarScroll();
+            setupModalListeners();
+        };
+
+        function renderMovies() {
+            const trendingRow = document.getElementById('trending-row');
+            const tvRow = document.getElementById('tv-row');
+            const blockbusterRow = document.getElementById('blockbuster-row');
+
+            movies.forEach(movie => {
+                const card = document.createElement('div');
+                card.className = 'movie-card flex-none w-48 md:w-64 aspect-video rounded-md overflow-hidden bg-gray-800 relative group';
+                card.innerHTML = `
+                    <img src="${movie.img}" alt="${movie.title}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-3">
+                        <div class="bg-white text-black w-8 h-8 rounded-full flex items-center justify-center text-xs">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="border border-gray-400 w-8 h-8 rounded-full flex items-center justify-center text-xs text-white">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p class="text-[10px] font-bold">${movie.title}</p>
+                    </div>
+                `;
+                
+                card.onclick = () => openModal(movie);
+
+                if (movie.type === 'trending') trendingRow.appendChild(card);
+                if (movie.type === 'tv') tvRow.appendChild(card);
+                if (movie.type === 'blockbuster') blockbusterRow.appendChild(card);
+            });
+        }
+
+        // Efek Scroll Navbar
+        function setupNavbarScroll() {
+            const navbar = document.getElementById('navbar');
+            window.onscroll = () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.remove('nav-gradient');
+                    navbar.classList.add('nav-solid');
+                } else {
+                    navbar.classList.remove('nav-solid');
+                    navbar.classList.add('nav-gradient');
+                }
+            };
+        }
+
+        // Logic Modal
+        const modal = document.getElementById('modal');
+        const closeModal = document.getElementById('close-modal');
+
+        function openModal(movie) {
+            document.getElementById('modal-title').innerText = movie.title;
+            document.getElementById('modal-desc').innerText = `Tonton petualangan seru "${movie.title}" sekarang juga. Nikmati kualitas audio terbaik dan resolusi 4K hanya di StreamVerse.`;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function setupModalListeners() {
+            closeModal.onclick = () => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            };
+
+            window.onclick = (event) => {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            };
+        }
+    </script>
+</body>
+</html>
